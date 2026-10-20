@@ -7,7 +7,8 @@ services:
       DB_HOST: db
       DB_PORT: 5432
     depends_on:
-      - db
+      db:
+        condition: service_healthy
   db:
     image: postgres:17-alpine
     environment:
@@ -16,6 +17,11 @@ services:
       POSTGRES_PASSWORD: dev-password
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U campus -d campus"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
 volumes:
   pgdata:
